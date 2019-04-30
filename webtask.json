@@ -1,6 +1,6 @@
 {
-  "title": "Auth0 Management API Webhooks",
-  "name": "auth0-webhooks",
+  "title": "Auth0 Management API Webhooks (Custom)",
+  "name": "auth0-webhooks-custom",
   "version": "2.1.0",
   "author": "auth0",
   "description": "Allows you to define webhooks for Auth0's Management API. It will go through the audit logs and call a webhook for specific events.",
@@ -10,10 +10,7 @@
   "repository": "https://github.com/auth0/auth0-management-api-webhooks",
   "docsUrl": "https://auth0.com/docs/extensions/management-api-webhooks",
   "logoUrl": "https://cdn.auth0.com/extensions/auth0-webhooks/assets/logo.svg",
-  "keywords": [
-    "auth0",
-    "extension"
-  ],
+  "keywords": ["auth0", "extension"],
   "schedule": "0 */5 * * * *",
   "auth0": {
     "createClient": true,
@@ -29,7 +26,7 @@
       "description": "Allows you to filter specific API endpoints, comma separated.",
       "example": "e.g.: users, connections, rules, emails, stats, clients, tenants"
     },
-    "WEBHOOK_URL":     {
+    "WEBHOOK_URL": {
       "required": true,
       "type": "text"
     },
@@ -54,7 +51,7 @@
         }
       ]
     },
-    "WEBHOOK_CONCURRENT_CALLS":     {
+    "WEBHOOK_CONCURRENT_CALLS": {
       "description": "The maximum concurrent calls that will be made to your webhook",
       "default": 5
     },
