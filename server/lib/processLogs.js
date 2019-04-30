@@ -18,7 +18,7 @@ module.exports = storage => (req, res, next) => {
     return next();
   }
 
-  const url = config("WEBHOOK_URL");
+  const urls = config("WEBHOOK_URL").split(",");
   const batchMode =
     config("SEND_AS_BATCH") === true || config("SEND_AS_BATCH") === "true";
   const concurrentCalls = parseInt(config("WEBHOOK_CONCURRENT_CALLS"), 10) || 5;
@@ -26,7 +26,7 @@ module.exports = storage => (req, res, next) => {
     ? { Authorization: config("AUTHORIZATION") }
     : {};
 
-  const sendRequest = (data, callback) =>
+  const sendRequest = (url, data, callback) =>
     Request(
       {
         method: "POST",
@@ -46,14 +46,30 @@ module.exports = storage => (req, res, next) => {
 
   const callWebhook = (logs, callback) => {
     if (batchMode) {
-      logger.info(`Sending to '${url}'.`);
-      return sendRequest(logs, callback);
+      return async.each(
+        urls,
+        function(url, cb) {
+          logger.info(`Sending to '${url}'.`);
+          return sendRequest(url, logs, cb);
+        },
+        function(err) {
+          callback(err);
+        }
+      );
     }
 
-    logger.info(
-      `Sending to '${url}' with ${concurrentCalls} concurrent calls.`
+    async.each(
+      urls,
+      function(url, cb) {
+        logger.info(
+          `Sending to '${url}' with ${concurrentCalls} concurrent calls.`
+        );
+        return async.eachLimit(logs, concurrentCalls, sendRequest, cb);
+      },
+      function(err) {
+        callback(err);
+      }
     );
-    return async.eachLimit(logs, concurrentCalls, sendRequest, callback);
   };
 
   const onLogsReceived = (logs, callback) => {
